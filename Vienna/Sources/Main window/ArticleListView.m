@@ -34,6 +34,7 @@
 #import "EnclosureView.h"
 #import "Database.h"
 #import "Vienna-Swift.h"
+#import "GeneratedAssetSymbols.h"
 
 // Shared defaults key
 NSString * const MAPref_ShowEnclosureBar = @"ShowEnclosureBar";
@@ -92,7 +93,6 @@ static void *VNAArticleListViewObserverContext = &VNAArticleListViewObserverCont
     NSMutableDictionary *unreadTopLineDict;
     NSMutableDictionary *unreadTopLineSelectionDict;
 
-    NSURL *currentURL;
     BOOL isLoadingHTMLArticle;
 }
 
@@ -109,7 +109,6 @@ static void *VNAArticleListViewObserverContext = &VNAArticleListViewObserverCont
 		markReadTimer = nil;
 		_currentPageFullHTML = NO;
 		isLoadingHTMLArticle = NO;
-		currentURL = nil;
 		self.imbricatedSplitViewResizes = NO;
         _layoutManager = [NSLayoutManager new];
     }
@@ -126,6 +125,7 @@ static void *VNAArticleListViewObserverContext = &VNAArticleListViewObserverCont
 	[nc addObserver:self selector:@selector(handleArticleListFontChange:) name:MA_Notify_ArticleListFontChange object:nil];
 	[nc addObserver:self selector:@selector(handleReadingPaneChange:) name:MA_Notify_ReadingPaneChange object:nil];
 	[nc addObserver:self selector:@selector(handleLoadFullHTMLChange:) name:MA_Notify_LoadFullHTMLChange object:nil];
+	[nc addObserver:self selector:@selector(handleStyleChange:) name:MA_Notify_StyleChange object:nil];
 	[nc addObserver:self selector:@selector(handleRefreshArticle:) name:MA_Notify_ArticleViewChange object:nil];
 	[nc addObserver:self selector:@selector(handleArticleViewEnded:) name:MA_Notify_ArticleViewEnded object:nil];
 
@@ -482,11 +482,11 @@ static void *VNAArticleListViewObserverContext = &VNAArticleListViewObserverCont
         [articleList setTableColumnHeaderImage:enclImage
                        forColumnWithIdentifier:MA_Field_HasEnclosure];
     } else {
-        [articleList setTableColumnHeaderImage:[NSImage imageNamed:@"unread_header"]
+        [articleList setTableColumnHeaderImage:[NSImage imageNamed:ACImageNameUnreadHeader]
                        forColumnWithIdentifier:MA_Field_Read];
-        [articleList setTableColumnHeaderImage:[NSImage imageNamed:@"flagged_header"]
+        [articleList setTableColumnHeaderImage:[NSImage imageNamed:ACImageNameFlaggedHeader]
                        forColumnWithIdentifier:MA_Field_Flagged];
-        [articleList setTableColumnHeaderImage:[NSImage imageNamed:@"enclosure_header"]
+        [articleList setTableColumnHeaderImage:[NSImage imageNamed:ACImageNameEnclosureHeader]
                        forColumnWithIdentifier:MA_Field_HasEnclosure];
     }
 
@@ -604,7 +604,9 @@ static void *VNAArticleListViewObserverContext = &VNAArticleListViewObserverCont
 	
 	for (NSTableColumn * column in articleList.tableColumns) {
 		if ([column.identifier isEqualToString:sortColumnIdentifier]) {
-			NSString * imageName = ([[Preferences standardPreferences].articleSortDescriptors[0] ascending]) ? @"NSAscendingSortIndicator" : @"NSDescendingSortIndicator";
+			// These NSImage names are available in AppKit, but not as constants.
+			// https://developer.apple.com/library/archive/releasenotes/AppKit/RN-AppKitOlderNotes/
+			NSImageName imageName = ([Preferences.standardPreferences.articleSortDescriptors[0] ascending]) ? @"NSAscendingSortIndicator" : @"NSDescendingSortIndicator";
 			articleList.highlightedTableColumn = column;
 			[articleList setIndicatorImage:[NSImage imageNamed:imageName] inTableColumn:column];
 		} else {
@@ -801,6 +803,16 @@ static void *VNAArticleListViewObserverContext = &VNAArticleListViewObserverCont
 		[self updateVisibleColumns];
 		[articleList reloadData];
 	}
+}
+
+/* handleStyleChange
+ * Respond to an article style change
+ */
+-(void)handleStyleChange:(NSNotification *)notification
+{
+    if (self == self.controller.articleController.mainArticleView) {
+        [self performSelector:@selector(refreshArticleAtCurrentRow) withObject:nil afterDelay:0.0];
+    }
 }
 
 /* setOrientation
@@ -1044,17 +1056,6 @@ static void *VNAArticleListViewObserverContext = &VNAArticleListViewObserverCont
     }
 }
 
-/* clearCurrentURL
- * Clears the current URL.
- */
--(void)clearCurrentURL
-{
-	// If we already have an URL release it.
-	if (currentURL) {
-		currentURL = nil;
-	}
-}
-
 /* loadArticleLink
  * Loads the specified link into the article text view. NOTE: This is done
  * via this selector method so that this is called via the event queue in
@@ -1070,27 +1071,9 @@ static void *VNAArticleListViewObserverContext = &VNAArticleListViewObserverCont
 	// Load the actual link.
 	articleText.tabUrl = cleanedUpUrlFromString(articleLink);
     [articleText loadTab];
-	
-	// Clear the current URL.
-	[self clearCurrentURL];
-	
-	// Remember the new URL.
-	currentURL = [[NSURL alloc] initWithString:articleLink];
 
 	// We need to redraw the article list so the progress indicator is shown.
     articleList.needsDisplay = YES;
-}
-
-/* url
- * Return the URL of current article.
- */
--(NSURL *)url
-{
-	if (self.isCurrentPageFullHTML) {
-		return currentURL;
-	} else { 
-		return nil;
-	}
 }
 
 /* refreshArticlePane
@@ -1101,9 +1084,6 @@ static void *VNAArticleListViewObserverContext = &VNAArticleListViewObserverCont
 	NSArray * msgArray = self.markedArticleRange;
 	
 	if (msgArray.count == 0) {
-		// Clear the current URL.
-		[self clearCurrentURL];
-
 		// We are not a FULL HTML page.
 		self.currentPageFullHTML = NO;
 		
@@ -1129,9 +1109,6 @@ static void *VNAArticleListViewObserverContext = &VNAArticleListViewObserverCont
 			// clearing of the HTML before this new link gets loaded.
 			[self performSelector: @selector(loadArticleLink:) withObject:firstArticle.link afterDelay:0.0];
 		} else {
-			// Clear the current URL.
-			[self clearCurrentURL];
-
 			// Remember we do NOT have a full HTML page so we can setup the context menus
 			// appropriately.
 			self.currentPageFullHTML = NO;
@@ -1213,9 +1190,9 @@ static void *VNAArticleListViewObserverContext = &VNAArticleListViewObserverCont
                 return image;
             } else {
                 if (theArticle.revised) {
-                    return [NSImage imageNamed:@"revised"];
+                    return [NSImage imageNamed:ACImageNameRevised];
                 } else {
-                    return [NSImage imageNamed:@"unread"];
+                    return [NSImage imageNamed:ACImageNameUnread];
                 }
             }
         }
@@ -1230,7 +1207,7 @@ static void *VNAArticleListViewObserverContext = &VNAArticleListViewObserverCont
                 image.template = NO;
                 return image;
             } else {
-                return [NSImage imageNamed:@"flagged"];
+                return [NSImage imageNamed:ACImageNameFlagged];
             }
         }
         return nil;
@@ -1242,7 +1219,7 @@ static void *VNAArticleListViewObserverContext = &VNAArticleListViewObserverCont
                                            accessibilityDescription:nil];
                 return image;
             } else {
-                return [NSImage imageNamed:@"enclosure"];
+                return [NSImage imageNamed:ACImageNameEnclosure];
             }
         }
         return nil;

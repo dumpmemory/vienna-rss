@@ -3,7 +3,7 @@
 [![Build status](https://github.com/ViennaRSS/vienna-rss/actions/workflows/xcodebuild.yml/badge.svg)](https://github.com/ViennaRSS/vienna-rss/actions/workflows/xcodebuild.yml)
 [![Localization status](https://d322cqt584bo4o.cloudfront.net/vienna-rss/localized.svg)](https://crowdin.com/project/vienna-rss "Crowdin")
 
-[Vienna](https://www.vienna-rss.com) is an RSS/Atom reader for macOS.
+[Vienna](https://www.vienna-rss.com) is an RSS/Atom/JSON Feed reader for macOS.
 
 Vienna can connect directly to the websites you want to track.
 Additionally or alternatively, you can also sync with a server supporting the [Open Reader API](http://rss-sync.github.io/Open-Reader-API/rssconsensus/) (an adaptation of the now deceased Google Reader API). Vienna has been successfully tested with BazQux.com, FreshRSS.org, FeedHQ.org, InoReader.com and TheOldReader.com.
@@ -12,8 +12,7 @@ Additionally or alternatively, you can also sync with a server supporting the [O
 Compatibility
 -------------
 
-Version 3.9 of Vienna will require a minimum of macOS 10.13 (High Sierra).
-
+Version 3.9.x requires a minimum of macOS 10.13 (High Sierra).  
 Vienna 3.8.x requires a minimum of macOS 10.12 (Sierra).  
 Vienna 3.6.x and 3.7.x require a minimum of OS X 10.11 (El Capitan).  
 Vienna 3.2.x to 3.5.x require a minimum of OS X 10.9 (Mavericks).  
@@ -37,14 +36,14 @@ brew install --cask vienna
 Getting support
 ---------------
 
-If the in-application help files and the [FAQ](https://www.vienna-rss.com/faq) don’t answer your questions, head over to our [Discussions page](https://github.com/ViennaRSS/vienna-rss/discussions) on GitHub or our [support forum](https://forums.cocoaforge.com/viewforum.php?f=18) which is hosted by Cocoaforge.
+If the in-application help files and the [FAQ](https://www.vienna-rss.com/faq) don’t answer your questions, head over to our [Discussions page](https://github.com/ViennaRSS/vienna-rss/discussions) on GitHub.
 
 Reporting an issue
 ------------------
 
-If after reading the forum and asking your questions there, you are convinced that there is a problem in Vienna's code or an important feature is missing, you may open an [issue](https://github.com/ViennaRSS/vienna-rss/issues?direction=desc&sort=created&state=open) on Github.
+If after reading the Discussions page or asking your questions there, you are convinced that there is a problem in Vienna's code or an important feature is missing, you may open an [issue](https://github.com/ViennaRSS/vienna-rss/issues?direction=desc&sort=created&state=open) on Github.
 
-Be concise, but as precise as possible to allow other people reproducing the issue. To keep things short, you can provide a link to a relevant thread or message on the Cocoaforge forum.
+Be concise, but as precise as possible to allow other people reproducing the issue. To keep things short, you can provide a link to a relevant discussion.
 
 Contributing
 ------------
