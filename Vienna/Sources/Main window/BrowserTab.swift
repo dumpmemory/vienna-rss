@@ -80,9 +80,8 @@ class BrowserTab: NSViewController {
 
     // MARK: object lifecycle
 
-    init(_ request: URLRequest? = nil, config: WKWebViewConfiguration = WKWebViewConfiguration()) {
-
-        self.webView = CustomWKWebView(configuration: config)
+    init(_ webView: CustomWKWebView) {
+        self.webView = webView
 
         if #available(macOS 10.14, *) {
             super.init(nibName: "BrowserTab", bundle: nil)
@@ -127,6 +126,10 @@ class BrowserTab: NSViewController {
                 self?.statusBar = nil
              }
         }
+    }
+
+    convenience init(_ request: URLRequest? = nil, config: WKWebViewConfiguration = WKWebViewConfiguration()) {
+        self.init(CustomWKWebView(configuration: config))
 
         if let request = request {
             webView.load(request)
@@ -255,8 +258,14 @@ extension BrowserTab: Tab {
     }
 
     func searchFor(_ searchString: String, action: NSFindPanelAction) {
-        // webView.evaluateJavaScript("document.execCommand('HiliteColor', false, 'yellow')", completionHandler: nil)
-        self.webView.search(searchString, upward: action == .previous)
+        if #available(macOS 11, *) {
+            let configuration = WKFindConfiguration()
+            configuration.backwards = action == .previous
+            webView.find(searchString, configuration: configuration) { _ in }
+        } else {
+            // webView.evaluateJavaScript("document.execCommand('HiliteColor', false, 'yellow')", completionHandler: nil)
+            self.webView.search(searchString, upward: action == .previous)
+        }
     }
 
     func loadTab() {

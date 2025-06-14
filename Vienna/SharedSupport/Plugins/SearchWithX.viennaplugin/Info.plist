@@ -3,12 +3,12 @@
 <plist version="1.0">
 <dict>
 	<key>Name</key>
-	<string>SearchWithWikipedia</string>
+	<string>SearchWithX</string>
 	<key>Type</key>
 	<string>SearchEngine</string>
 	<key>SearchQueryString</key>
-	<string>https://en.wikipedia.org/w/index.php?title=Special:Search&amp;search=$SearchTerm$&amp;go=Go</string>
+	<string>https://x.com/search?q=$SearchTerm$&amp;src=typd</string>
 	<key>FriendlyName</key>
-	<string>Wikipedia</string>
+	<string>Search X (x.com)</string>
 </dict>
 </plist>
