@@ -40,6 +40,8 @@ class CustomWKWebView: WKWebView {
         getTextSelection()
     }
 
+    private let usesMinimumFontSizeObservation: NSKeyValueObservation
+    private let minimumFontSizeObservation: NSKeyValueObservation
     private var useJavaScriptObservation: NSKeyValueObservation?
 
     override init(frame: CGRect = .zero, configuration: WKWebViewConfiguration = WKWebViewConfiguration()) {
@@ -59,6 +61,24 @@ class CustomWKWebView: WKWebView {
             prefs._developerExtrasEnabled = true
         }
         #endif
+
+        usesMinimumFontSizeObservation = Preferences.standard
+            .observe(\.enableMinimumFontSize, options: .initial) { preferences, _ in
+                guard !preferences.enableMinimumFontSize else {
+                    prefs.minimumFontSize = CGFloat(preferences.minimumFontSize)
+                    return
+                }
+                prefs.minimumFontSize = 0.0
+            }
+
+        minimumFontSizeObservation = Preferences.standard
+            .observe(\.minimumFontSize, options: .initial) { preferences, _ in
+                guard preferences.enableMinimumFontSize else {
+                    prefs.minimumFontSize = 0.0
+                    return
+                }
+                prefs.minimumFontSize = CGFloat(preferences.minimumFontSize)
+            }
 
         useJavaScriptObservation = Preferences.standard.observe(\.useJavaScript, options: [.initial, .new]) { _, change  in
             guard let newValue = change.newValue else {
@@ -131,6 +151,7 @@ class CustomWKWebView: WKWebView {
         }
     }
 
+    @available(macOS, deprecated: 11, message: "Use find(_:configuration:completionHandler:)")
     func search(_ text: String = "", upward: Bool = false) {
         self.evaluateJavaScript("window.find(textToFind='\(text)', matchCase=false, searchUpward=\(upward ? "true" : "false"), wrapAround=true)", completionHandler: nil)
     }

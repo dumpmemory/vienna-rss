@@ -3,12 +3,12 @@
 <plist version="1.0">
 <dict>
 	<key>Name</key>
-	<string>SearchWithDuckDuckGo</string>
+	<string>SearchWithQwant</string>
 	<key>Type</key>
 	<string>SearchEngine</string>
 	<key>SearchQueryString</key>
-	<string>https://duckduckgo.com/?q=$SearchTerm$</string>
+	<string>https://www.qwant.com/?q=$SearchTerm$</string>
 	<key>FriendlyName</key>
-	<string>DuckDuckGo</string>
+	<string>Search Qwant</string>
 </dict>
 </plist>

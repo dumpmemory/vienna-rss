@@ -60,13 +60,17 @@ class WebKitArticleTab: BrowserTab, ArticleContentView {
     @objc
     init() {
         self.articleWebView = WebKitArticleView(frame: CGRect.zero)
-        super.init()
+        super.init(articleWebView)
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         addressField.isEditable = false
         hideAddressBar(true)
+    }
+
+    override func viewDidLoadRss() {
+        // No need to search RSS feed in article tab
     }
 
     // MARK: gui
