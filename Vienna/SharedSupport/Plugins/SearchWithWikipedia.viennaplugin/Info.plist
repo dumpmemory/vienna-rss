@@ -3,12 +3,12 @@
 <plist version="1.0">
 <dict>
 	<key>Name</key>
-	<string>SearchWithQwant</string>
+	<string>SearchWithWikipedia</string>
 	<key>Type</key>
 	<string>SearchEngine</string>
 	<key>SearchQueryString</key>
-	<string>https://www.qwant.com/?q=$SearchTerm$</string>
+	<string>https://en.wikipedia.org/w/index.php?title=Special:Search&amp;search=$SearchTerm$&amp;go=Go</string>
 	<key>FriendlyName</key>
-	<string>Qwant</string>
+	<string>Search Wikipedia</string>
 </dict>
 </plist>
